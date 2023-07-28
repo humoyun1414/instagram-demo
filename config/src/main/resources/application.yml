@@ -1,0 +1,19 @@
+server:
+  port: 8888
+
+spring:
+  application:
+    name: config
+  cloud:
+    config:
+      server:
+        composite:
+         - type: native
+           search-locations: classpath:/shared
+  profiles:
+    active: composite
+  security:
+    user:
+      password: humoyun
+
+

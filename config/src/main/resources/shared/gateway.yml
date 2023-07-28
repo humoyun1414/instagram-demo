@@ -1,0 +1,31 @@
+server:
+  port: 8080
+spring:
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+
+zuul:
+  SendErrorFilter:
+    post:
+      disable: true
+  ignoreServices: '*'
+  ignoredPatterns: '/api/v1/*/internal/**'
+  sensitive-headers: Cookie,Set-Cookie
+  routes:
+    user: /api/v1/user/**
+    post: /api/v1/post/**
+    subscribe: /api/v1/subscribe/**
+
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+          timeoutInMilliseconds: 6000
+
+ribbon:
+  ConnectTimeOut: 3000
+  ReadTimeOut: 60000
