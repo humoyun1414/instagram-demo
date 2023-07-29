@@ -1,7 +1,6 @@
 package uz.humoyun.user
 
 
-
 data class BaseMessage(var code: Int?, var message: String?)
 
 data class UserDto(
@@ -9,7 +8,7 @@ data class UserDto(
     var username: String,
     var password: String,
     var phone: String,
-    var bio: String,
+    var bio: String?,
 ) {
     fun toEntity() = User(name, username, password, phone, bio)
 }
@@ -20,7 +19,7 @@ data class GetUserDto(
     var username: String,
     var password: String,
     var phone: String,
-    var bio: String
+    var bio: String?
 ) {
     companion object {
         fun toDto(entity: User) = entity.run {
@@ -29,3 +28,15 @@ data class GetUserDto(
     }
 }
 
+data class UpdateUserDto(
+    var name: String?,
+    var username: String?,
+    var password: String?,
+    var phone: String?,
+    var bio: String?,
+)
+
+data class LoginDto(
+    var username: String,
+    var password: String,
+)

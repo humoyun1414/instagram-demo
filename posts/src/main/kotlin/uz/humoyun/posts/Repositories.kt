@@ -46,17 +46,28 @@ class BaseRepositoryImpl<T : BaseEntity>(
 
 interface PostRepository : BaseRepository<Post> {
     fun existsByIdAndDeletedFalse(id: Long): Boolean
-
+    fun findByUserIdAndDeletedFalse(userId: Long, pageable: Pageable): Page<Post>
 
     @Query(
         value = "SELECT * FROM posts WHERE id NOT IN (SELECT post_id FROM views WHERE user_id = :userId)",
         nativeQuery = true
     )
-    fun findByUserIdAndDeletedFalse(@Param("userId") userId: Long, pageable: Pageable): Page<Post>
+    fun findByUserId(@Param("userId") userId: Long): MutableList<Post>
+    /*
+
+        @Query(
+            value = "SELECT * FROM posts WHERE id NOT IN (SELECT post_id FROM views WHERE user_id = :userId)",
+            nativeQuery = true
+        )
+        fun findByUserIdAndDeletedFalse(@Param("userId") userId: Long, pageable: Pageable): Page<Post>
+    */
 
 }
 
 interface LikePostRepository : BaseRepository<LikePost> {
+    fun findByPostIdAndDeletedFalse(postId: Long): MutableList<GetLikePostDto>
+    fun findByUserIdAndDeletedFalse(userId: Long): MutableList<GetLikePostDto>
+    fun findByUserIdAndPostId(userId: Long, postId: Long): LikePost?
 }
 
 interface ViewRepository : BaseRepository<View> {

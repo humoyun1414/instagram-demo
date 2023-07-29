@@ -31,7 +31,13 @@ interface PostService {
     fun existById(id: Long): Boolean
     fun update(id: Long, dto: UpdatePostDto)
     fun delete(id: Long)
-    fun getByIdMyFollowingUserPosts(id: Long, page: Int, size: Int): MutableList<GetPostDto>
+    fun findByMyFollowingUserPosts(id: Long, page: Int, size: Int): MutableList<GetPostDto>
+}
+
+interface LikePostService {
+    fun create(likePostDto: LikePostDto)
+    fun getByPostId(postId: Long): MutableList<GetLikePostDto>
+    fun getByUserId(userId: Long): MutableList<GetLikePostDto>
 }
 
 @Service
@@ -75,20 +81,64 @@ class PostServiceImpl(
         postRepository.trash(id)
     }
 
-    override fun getByIdMyFollowingUserPosts(id: Long, page: Int, size: Int): MutableList<GetPostDto> {
+    override fun findByMyFollowingUserPosts(id: Long, page: Int, size: Int): MutableList<GetPostDto> {
         val dtoList = subscribeService.findByMyFollowingPosts(id)
         val mutableList: MutableList<GetPostDto> = mutableListOf()
         val pageable = PageRequest.of(page, size, Sort.by("created_date").descending())
 
         for (transferDto in dtoList) {
             mutableList.addAll(
-                postRepository.findByUserIdAndDeletedFalse(transferDto.followingUserId, pageable)
+                postRepository.findByUserId(transferDto.followingUserId)
                     .map {
-                        viewRepository.save(View(id, it.id!!))
                         GetPostDto(it.id!!, it.title, it.userId)
                     }
             )
         }
-        return mutableList
+        return if (mutableList.isEmpty()) {
+            for (transferDto in dtoList) {
+                mutableList.addAll(postRepository.findByUserIdAndDeletedFalse(transferDto.followingUserId, pageable)
+                    .map { GetPostDto(it.id!!, it.title, it.userId) })
+            }
+            mutableList
+        } else {
+            val shuffled = mutableList.shuffled().take(size)
+                .toMutableList()
+            shuffled.forEach {
+                viewRepository.save(View(it.userId, it.id))
+            }
+            shuffled
+        }
+    }
+}
+
+@Service
+class LikePostServiceImpl(
+    private val likePostRepository: LikePostRepository,
+    private val postRepository: PostRepository,
+    private val userService: UserService,
+) : LikePostService {
+    override fun create(likePostDto: LikePostDto) {
+        val likePost = likePostRepository.findByUserIdAndPostId(likePostDto.userId, likePostDto.postId)
+        if (likePost != null) {
+            likePost.like = false
+            likePostRepository.save(likePost)
+        } else {
+            if (!userService.existById(likePostDto.userId)) throw UserNotFoundException(likePostDto.userId)
+            if (!postRepository.existsByIdAndDeletedFalse(likePostDto.postId)) throw PostNotFoundException(likePostDto.postId)
+            likePostDto.run {
+                likePostRepository.save(toEntity())
+            }
+
+        }
+    }
+
+    override fun getByPostId(postId: Long): MutableList<GetLikePostDto> {
+        if (postRepository.existsByIdAndDeletedFalse(postId)) throw PostNotFoundException(postId)
+        return likePostRepository.findByPostIdAndDeletedFalse(postId)
+    }
+
+    override fun getByUserId(userId: Long): MutableList<GetLikePostDto> {
+        if (userService.existById(userId)) throw UserNotFoundException(userId)
+        return likePostRepository.findByUserIdAndDeletedFalse(userId)
     }
 }

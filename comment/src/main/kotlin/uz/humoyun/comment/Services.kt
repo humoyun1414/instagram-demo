@@ -1,8 +1,6 @@
 package uz.humoyun.comment
 
 import org.springframework.cloud.openfeign.FeignClient
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -25,7 +23,7 @@ interface CommentService {
     fun create(dto: CommentDto)
     fun getById(id: Long): GetCommentDto
     fun getAllCommentByPostId(postId: Long): MutableList<GetCommentDto>
-    fun updateComment(id: Long, newText: String)
+    fun update(commentId: Long, newText: String)
     fun delete(id: Long)
 }
 
@@ -54,12 +52,14 @@ class CommentImpl(
         return commentRepository.findAllByPostId(postId)
     }
 
-    override fun updateComment(id: Long, newText: String) {
-
+    override fun update(commentId: Long, newText: String) {
+        val comment = commentRepository.findByIdAndDeletedFalse(commentId) ?: throw CommentNotFoundException(commentId)
+        newText.let { comment.text = it }
+        commentRepository.save(comment)
     }
 
     override fun delete(id: Long) {
-
+        commentRepository.trash(id)
     }
 
 

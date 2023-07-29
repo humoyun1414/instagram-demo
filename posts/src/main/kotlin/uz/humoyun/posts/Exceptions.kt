@@ -21,6 +21,9 @@ sealed class PostServiceException(message: String? = null) : RuntimeException(me
 class PostNotFoundException(val id:Long) : PostServiceException() {
     override fun errorType() = ErrorCode.POST_NOT_FOUND
 }
+class LikeNotFoundException(val id:Long) : PostServiceException() {
+    override fun errorType() = ErrorCode.LIKE_NOT_FOUND
+}
 
 class UserNotFoundException(val userId:Long) : PostServiceException() {
     override fun errorType() = ErrorCode.USER_NOT_FOUND

@@ -25,8 +25,8 @@ class ExceptionHandlers(
 @RestController
 class UserController(private val userService: UserService) {
     @PostMapping
-    fun create(@RequestBody userDto: UserDto) =
-        userService.create(userDto)
+    fun register(@RequestBody userDto: UserDto) =
+        userService.register(userDto)
 
     @GetMapping("{id}")
     fun getById(@PathVariable id: Long) = userService.getById(id)
@@ -35,7 +35,7 @@ class UserController(private val userService: UserService) {
     fun getAll(pageable: Pageable) = userService.getAll(pageable)
 
     @PutMapping("{id}")
-    fun update(@PathVariable id: Long, userDto: UserDto) = userService.update(id, userDto)
+    fun update(@PathVariable id: Long, userDto: UpdateUserDto) = userService.update(id, userDto)
 
     @DeleteMapping("{id}")
     fun delete(@PathVariable id: Long) = userService.delete(id)

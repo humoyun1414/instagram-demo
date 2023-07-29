@@ -30,7 +30,7 @@ class Post(
 class LikePost(
     @Column(nullable = false) val userId: Long,
     @Column(nullable = false) val postId: Long,
-    @Enumerated(EnumType.STRING) val likeEnum: Like
+    var like: Boolean = false
 ) : BaseEntity()
 
 

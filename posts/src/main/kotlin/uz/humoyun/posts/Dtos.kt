@@ -25,10 +25,11 @@ data class GetPostDto(
         fun toDto(entity: Post) = entity.run { GetPostDto(id!!, title, userId) }
     }
 }
+
 data class UpdatePostDto(
     val title: String,
 
-) {
+    ) {
     companion object {
         fun toDto(entity: Post) = entity.run { UpdatePostDto(title) }
     }
@@ -38,4 +39,19 @@ data class TransferDto(
     val id: Long,
     val followersUserId: Long,
     val followingUserId: Long,
+)
+
+data class LikePostDto(
+    val userId: Long,
+    val postId: Long
+
+) {
+    fun toEntity() = LikePost(userId, postId,true)
+}
+
+data class GetLikePostDto(
+    val id: Long,
+    val userId: Long,
+    val postId: Long,
+    val like: Boolean
 )

@@ -1,6 +1,6 @@
 package uz.humoyun.comment
+
 import org.springframework.context.support.ResourceBundleMessageSource
-import org.springframework.data.domain.Pageable
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
@@ -28,28 +28,20 @@ class ExceptionHandlers(
 }
 
 @RestController
-class UserController(private val userService: UserService) {
+class CommentController(private val commentService: CommentService) {
     @PostMapping
-    fun create(@RequestBody userDto: UserDto) =
-        userService.create(userDto)
+    fun create(@RequestBody commentDto: CommentDto) =
+        commentService.create(commentDto)
 
     @GetMapping("{id}")
-    fun getById(@PathVariable id: Long) = userService.getById(id)
+    fun getById(@PathVariable id: Long) = commentService.getById(id)
 
-    @GetMapping
-    fun getAll(pageable: Pageable) = userService.getAll(pageable)
+    @GetMapping("all/{postId}")
+    fun getAllCommentByPostId(@PathVariable postId: Long) = commentService.getAllCommentByPostId(postId)
 
     @PutMapping("{id}")
-    fun update(@PathVariable id: Long, userDto: UserDto) = userService.update(id, userDto)
+    fun update(@PathVariable id: Long, text: String) = commentService.update(id, text)
 
     @DeleteMapping("{id}")
-    fun delete(@PathVariable id: Long) = userService.delete(id)
-}
-
-
-@RestController
-@RequestMapping("internal")
-class UserInternalController(private val service: UserService) {
-    @GetMapping("exists/{id}")
-    fun existById(@PathVariable id: Long) = service.existById(id)
+    fun delete(@PathVariable id: Long) = commentService.delete(id)
 }

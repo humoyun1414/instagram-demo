@@ -1,0 +1,6 @@
+gateway(8080)
+user(8091)
+subscribe(8092)
+post(8093)
+comment(8094)
+discovery(8761)

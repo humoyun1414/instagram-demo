@@ -18,10 +18,9 @@ sealed class UserServiceException(message: String? = null) : RuntimeException(me
     }
 }
 
-class UserNotFoundException : UserServiceException() {
+class UserNotFoundException: UserServiceException() {
     override fun errorType() = ErrorCode.USER_NOT_FOUND
 }
-
 class UsernameAlreadyExistsException(val username: String) : UserServiceException() {
     override fun errorType() = ErrorCode.USER_NAME_EXISTS
 }

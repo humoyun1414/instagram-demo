@@ -2,6 +2,7 @@ package uz.humoyun.user
 
 import javax.persistence.*
 import org.hibernate.annotations.ColumnDefault
+import javax.validation.constraints.Pattern
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
@@ -19,11 +20,16 @@ class BaseEntity(
 @Entity(name = "users")
 @EntityListeners(AuditingEntityListener::class)
 class User(
-    var name: String,
+    @Column(nullable = true) var name: String,
     @Column(unique = true) var username: String,
-    @Column(nullable = false) var password: String,
-    var phone: String,
-    var bio: String,
+    @Column(nullable = false)
+    @field:Pattern(
+        regexp = "^(?=.*[A-Z])(?=.*\\d.*\\d).{8,10}$",
+        message = "Password must contain at least one uppercase letter and two numbers. Length must be between 8 and 10 characters."
+    )
+    var password: String,
+    @Column(nullable = false) var phone: String,
+    var bio: String?,
 ) : BaseEntity()
 
 
